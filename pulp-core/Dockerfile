@@ -1,5 +1,5 @@
 # syntax = docker/dockerfile:experimental
-FROM fedora:33 as build
+FROM fedora:35 as build
 ENV PYTHONUNBUFFERED 1
 
 # Install build dependencies
@@ -51,7 +51,7 @@ RUN for P in /opt/pulp/kong_patches/*; do \
     ; done
 
 ## Main image
-FROM fedora:33
+FROM fedora:35
 ENV PYTHONUNBUFFERED 1
 ENV PATH /opt/pulp/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
@@ -89,7 +89,6 @@ RUN --mount=type=cache,target=/var/cache/dnf \
       gobject-introspection \
       expat \
       zchunk-libs \
-      compat-openssl10 \
     && dnf clean all
 
 WORKDIR /var/lib/pulp
