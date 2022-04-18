@@ -13,7 +13,7 @@ jobs:
   auto-approve-github-actions:
     runs-on: ubuntu-latest
     if: >-
-      github.actor == 'dependabot[bot]' 
+      github.actor == 'dependabot[bot]'
       ||
       github.actor == 'dependabot-preview[bot]'
     steps:
