@@ -1,85 +1,79 @@
 diff --git a/pulpcore/app/settings.py b/pulpcore/app/settings.py
-index fc92c2456..70e048ef6 100644
+index 8a544803a..45c1ea547 100644
 --- a/pulpcore/app/settings.py
 +++ b/pulpcore/app/settings.py
-@@ -60,6 +60,11 @@ DB_ENCRYPTION_KEY = "/etc/pulp/certs/database_fields.symmetric.key"
+@@ -56,6 +56,12 @@ FILE_UPLOAD_HANDLERS = ("pulpcore.app.files.HashingFileUploadHandler",)
  
- # API Root
- API_ROOT = "/pulp/"
+ SECRET_KEY = True
+ 
 +# regex to alter path in content-disposition header & str to replace them with
 +# wrapped in parens to prevent dynaconf from thinking this is a list :/
 +#S3_REPO_MANGLE_REGEX = r'([^-a-zA-Z0-9._])'
 +S3_REPO_MANGLE_REGEX = r'([/=;])'
 +S3_REPO_MANGLE_TO = '__'
- 
++
  # Application definition
  
+ INSTALLED_APPS = [
 diff --git a/pulpcore/content/handler.py b/pulpcore/content/handler.py
-index 61a700108..b2cb3fea5 100644
+index 03631328b..e3f8f865c 100644
 --- a/pulpcore/content/handler.py
 +++ b/pulpcore/content/handler.py
-@@ -543,7 +543,7 @@ class Handler:
+@@ -523,7 +523,7 @@ class Handler:
                  pass
              else:
                  if ca.artifact:
--                    return await self._serve_content_artifact(ca, headers, request)
-+                    return await self._serve_content_artifact(ca, headers, request, path)
+-                    return await self._serve_content_artifact(ca, headers)
++                    return await self._serve_content_artifact(ca, headers, path)
                  else:
                      return await self._stream_content_artifact(
                          request, StreamResponse(headers=headers), ca
-@@ -571,7 +571,7 @@ class Handler:
+@@ -551,7 +551,7 @@ class Handler:
                      pass
                  else:
                      if ca.artifact:
--                        return await self._serve_content_artifact(ca, headers, request)
-+                        return await self._serve_content_artifact(ca, headers, request, path)
+-                        return await self._serve_content_artifact(ca, headers)
++                        return await self._serve_content_artifact(ca, headers, path)
                      else:
                          return await self._stream_content_artifact(
                              request, StreamResponse(headers=headers), ca
-@@ -617,7 +617,7 @@ class Handler:
+@@ -597,7 +597,7 @@ class Handler:
                  pass
              else:
                  if ca.artifact:
--                    return await self._serve_content_artifact(ca, headers, request)
-+                    return await self._serve_content_artifact(ca, headers, request, path)
+-                    return await self._serve_content_artifact(ca, headers)
++                    return await self._serve_content_artifact(ca, headers, path)
                  else:
                      return await self._stream_content_artifact(
                          request, StreamResponse(headers=headers), ca
-@@ -644,7 +644,7 @@ class Handler:
-                 ra = await sync_to_async(get_remote_artifact_blocking)()
+@@ -624,7 +624,7 @@ class Handler:
+                 ra = await loop.run_in_executor(None, get_remote_artifact_blocking)
                  ca = ra.content_artifact
                  if ca.artifact:
--                    return await self._serve_content_artifact(ca, headers, request)
-+                    return await self._serve_content_artifact(ca, headers, request, path)
+-                    return await self._serve_content_artifact(ca, headers)
++                    return await self._serve_content_artifact(ca, headers, path)
                  else:
                      return await self._stream_content_artifact(
                          request, StreamResponse(headers=headers), ca
-@@ -788,7 +788,7 @@ class Handler:
+@@ -761,7 +761,7 @@ class Handler:
                  content_artifact.save()
          return artifact
  
--    async def _serve_content_artifact(self, content_artifact, headers, request):
-+    async def _serve_content_artifact(self, content_artifact, headers, request, path=''):
+-    async def _serve_content_artifact(self, content_artifact, headers):
++    async def _serve_content_artifact(self, content_artifact, headers, path=''):
          """
          Handle response for a Content Artifact with the file present.
  
-@@ -800,6 +800,7 @@ class Handler:
-                 respond with.
-             headers (dict): A dictionary of response headers.
-             request(:class:`~aiohttp.web.Request`): The request to prepare a response for.
-+            path (string): The path requested
- 
-         Raises:
-             :class:`aiohttp.web_exceptions.HTTPFound`: When we need to redirect to the file
-@@ -821,6 +822,11 @@ class Handler:
-         elif not settings.REDIRECT_TO_OBJECT_STORAGE:
-             return ArtifactResponse(content_artifact.artifact, headers=headers)
+@@ -786,7 +786,11 @@ class Handler:
+         if settings.DEFAULT_FILE_STORAGE == "pulpcore.app.models.storage.FileSystem":
+             return FileResponse(os.path.join(settings.MEDIA_ROOT, artifact_name), headers=headers)
          elif settings.DEFAULT_FILE_STORAGE == "storages.backends.s3boto3.S3Boto3Storage":
+-            content_disposition = f"attachment;filename={content_artifact.relative_path}"
 +            artifact_file = content_artifact.artifact.file
 +            mangled_repo_path = re.sub(
 +                settings.S3_REPO_MANGLE_REGEX, settings.S3_REPO_MANGLE_TO, path)
 +            artifact_name = os.path.basename(content_artifact.relative_path)
 +            content_disposition = f'attachment;x-pulp-artifact-path={mangled_repo_path};filename={artifact_name}'
              parameters = {"ResponseContentDisposition": content_disposition}
-             if headers.get("Content-Type"):
-                 parameters["ResponseContentType"] = headers.get("Content-Type")
+             url = URL(
+                 artifact_file.storage.url(artifact_file.name, parameters=parameters), encoded=True
