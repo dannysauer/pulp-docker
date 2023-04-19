@@ -81,7 +81,7 @@ redis==4.3.4
 s3transfer==0.6.0
 six==1.16.0
 solv==0.7.22
-sqlparse==0.4.3
+sqlparse==0.4.4
 tablib==3.2.1
 typing_extensions==4.4.0
 uritemplate==4.1.1
