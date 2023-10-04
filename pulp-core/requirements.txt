@@ -86,7 +86,7 @@ tablib==3.2.1
 typing_extensions==4.4.0
 uritemplate==4.1.1
 url-normalize==1.4.3
-urllib3==1.26.12
+urllib3==1.26.17
 urlman==2.0.1
 whitenoise==6.2.0
 wrapt==1.14.1
