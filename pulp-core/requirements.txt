@@ -12,7 +12,7 @@ django-storages @ git+https://github.com/Kong/django-storages@32e8bef8f8fb4ad57b
 ## The following requirements were added by pip freeze:
 aiodns==3.0.0
 aiofiles==22.1.0
-aiohttp==3.8.3
+aiohttp==3.9.4
 aiohttp-xmlrpc==1.5.0
 aioredis==2.0.1
 aiosignal==1.2.0
@@ -28,7 +28,7 @@ chardet==5.0.0
 charset-normalizer==2.1.1
 click==8.1.3
 createrepo-c==0.20.1
-cryptography==37.0.4
+cryptography==42.0.6
 defusedxml==0.7.1
 Deprecated==1.2.13
 diff-match-patch==20200713
