@@ -32,7 +32,7 @@ cryptography==37.0.4
 defusedxml==0.7.1
 Deprecated==1.2.13
 diff-match-patch==20200713
-Django==3.2.16
+Django==4.2.16
 django-currentuser==0.5.3
 django-filter==22.1
 django-guid==3.3.0
@@ -81,7 +81,7 @@ redis==4.3.4
 s3transfer==0.6.0
 six==1.16.0
 solv==0.7.22
-sqlparse==0.4.3
+sqlparse==0.5.0
 tablib==3.2.1
 typing_extensions==4.4.0
 uritemplate==4.1.1
