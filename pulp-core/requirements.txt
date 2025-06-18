@@ -63,10 +63,10 @@ odfpy==1.4.1
 openpyxl==3.0.10
 packaging==21.3
 productmd==1.33
-protobuf==4.21.9
+protobuf==4.25.8
 psycopg2==2.9.5
 pycairo==1.21.0
-pycares==4.2.2
+pycares==4.9.0
 pycparser==2.21
 PyGObject==3.42.2
 pygtrie==2.5.0
